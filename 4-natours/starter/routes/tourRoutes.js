@@ -9,8 +9,10 @@ const {
   updateTour,
   top5CheapTour,
   getTourStats,
+  getMonthlyPlan,
 } = require('../controllers/tourController');
 
+router.route('/monthly-plan/:year').get(getMonthlyPlan);
 router.route('/tour-stats').get(getTourStats);
 router.route('/top-5-cheap').get(top5CheapTour, getTours);
 router.route('/').get(getTours).post(createTour);
