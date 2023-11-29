@@ -27,6 +27,7 @@ exports.getTours = async (req, res) => {
       },
     });
   } catch (e) {
+    console.log(e);
     res.status(404).json({
       status: 'fail',
       message: e,
@@ -75,7 +76,6 @@ exports.updateTour = async (req, res) => {
   const { id } = req.params;
 
   try {
-    console.log(req.body);
     const tour = await Tour.findByIdAndUpdate(id, req.body, {
       new: true,
       runValidators: true,
