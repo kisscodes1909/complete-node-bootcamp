@@ -8,6 +8,8 @@ const tourSchema = new mongoose.Schema(
       required: [true, 'A tour must have a name'],
       unique: true,
       trim: true,
+      maxlength: [40, 'A tour name must have less or equal then 40 characters'],
+      minlength: [10, 'A tour name must have more or equal then 10 characters'],
     },
     slug: String,
     duration: {
@@ -21,10 +23,16 @@ const tourSchema = new mongoose.Schema(
     difficulty: {
       type: String,
       required: [true, 'A tour must have a difficulty'],
+      enum: {
+        values: ['easy', 'medium', 'hard'],
+        message: '{VALUE} must be easy, medium, hard',
+      },
     },
     ratingAverage: {
       type: Number,
       default: 4.5,
+      min: [1, 'A tour must have min rating average is 1.0'],
+      max: [5, 'A tour must have max rating averate is 5.0'],
     },
     ratingsQuantity: {
       type: Number,
@@ -34,7 +42,16 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'A tour must have a price'],
     },
-    priceDiscount: Number,
+    priceDiscount: {
+      type: Number,
+      validate: {
+        // This validator only work creation
+        validator: function (value) {
+          return value < this.price;
+        },
+        message: 'Discount price ({VALUE}) should be below regular price',
+      },
+    },
     summary: {
       type: String,
       trim: true,
@@ -56,7 +73,7 @@ const tourSchema = new mongoose.Schema(
     },
     startDates: [Date],
     secret: {
-      type: String,
+      type: Boolean,
       default: false,
     },
   },
@@ -92,6 +109,19 @@ tourSchema.pre(/find/, function (next) {
 //   console.log(doc);
 //   next();
 // });
+
+// AGGREGATION
+
+tourSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({
+    $match: {
+      secret: { $ne: true },
+    },
+  });
+
+  console.log(this.pipeline());
+  next();
+});
 
 const Tour = mongoose.model('Tour', tourSchema);
 
