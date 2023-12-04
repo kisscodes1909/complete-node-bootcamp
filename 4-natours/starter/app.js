@@ -29,9 +29,21 @@ app.use('/api/v1/users', userRouter);
 // for any request that doesn't match the paths defined earlier with app.use()
 // It returns a 404 error for routes that don't match previously defined routes.
 app.all('*', (req, res, next) => {
-  res.status(404).json({
-    status: 'fail',
-    message: `Can't find ${req.originalUrl} on this server!`,
+  const error = new Error(`Can't find ${req.originalUrl} on this server!`);
+  error.status = 404;
+  error.statuCode = 'Failed';
+
+  next(error);
+});
+
+app.use((error, req, res, next) => {
+  const statusCode = error.statusCode || 500;
+  const status = error.status || 'Error';
+  const { message } = error;
+
+  res.status(statusCode).json({
+    status,
+    message,
   });
 });
 
