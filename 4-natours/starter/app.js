@@ -2,6 +2,8 @@ const express = require('express');
 
 const app = express();
 const morgan = require('morgan');
+const AppError = require('./utils/appError');
+const appErrorController = require('./controllers/appErrorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 
@@ -29,22 +31,10 @@ app.use('/api/v1/users', userRouter);
 // for any request that doesn't match the paths defined earlier with app.use()
 // It returns a 404 error for routes that don't match previously defined routes.
 app.all('*', (req, res, next) => {
-  const error = new Error(`Can't find ${req.originalUrl} on this server!`);
-  error.status = 404;
-  error.statuCode = 'Failed';
-
-  next(error);
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, '404'));
 });
 
-app.use((error, req, res, next) => {
-  const statusCode = error.statusCode || 500;
-  const status = error.status || 'Error';
-  const { message } = error;
-
-  res.status(statusCode).json({
-    status,
-    message,
-  });
-});
+// App Global Error Handler
+app.use(appErrorController);
 
 module.exports = app;
