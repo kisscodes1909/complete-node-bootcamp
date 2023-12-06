@@ -1,7 +1,7 @@
 const AppError = require('../utils/appError');
 
 const sendErrorDev = (res, error) => {
-  res.status(error.statusCode).json({
+  res.status(parseInt(error.statusCode, 10)).json({
     status: error.status,
     message: error.message,
     stack: error.stack,
