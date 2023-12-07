@@ -30,9 +30,9 @@ app.use('/api/v1/users', userRouter);
 // Since it lacks a specific path, this middleware will be triggered
 // for any request that doesn't match the paths defined earlier with app.use()
 // It returns a 404 error for routes that don't match previously defined routes.
-// app.all('*', (req, res, next) => {
-//   next(new AppError(`Can't find ${req.originalUrl} on this server!`, '404'));
-// });
+app.all('*', (req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, '404'));
+});
 
 // App Global Error Handler
 app.use(appErrorController);
