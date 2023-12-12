@@ -37,15 +37,23 @@ const handleMongoDuplicateDocument = (error) => {
   return new AppError(`The ${keyValue.name} was duplicated`, 400);
 };
 
+function handleJsonTokenError() {
+  return new AppError('The token is invalid', 401);
+}
+
+function handleJWTTokenExpired() {
+  return new AppError('The token was expired', 401);
+}
+
 module.exports = (error, req, res, next) => {
   error.statusCode = error.statusCode || 500;
   error.status = error.status || 'Error';
   if (process.env.NODE_ENV === 'development') {
-    // Handle MongoDB Error.
     sendErrorDev(res, error);
   } else if (process.env.NODE_ENV === 'production') {
     const { name: errorName, code } = error;
 
+    // MongoDB Error Handler
     if (errorName === 'CastError') error = handleInvalidIDDB(error);
 
     if (errorName === 'MongoError' && code === 11000)
@@ -55,6 +63,10 @@ module.exports = (error, req, res, next) => {
       error = new AppError(error.message, 400);
     }
 
+    //JWT Error Handler
+    if (errorName === 'JsonWebTokenError') error = handleJsonTokenError();
+
+    if (errorName === 'TokenExpiredError') error = handleJWTTokenExpired();
     sendErrorProduction(res, error);
   }
 };

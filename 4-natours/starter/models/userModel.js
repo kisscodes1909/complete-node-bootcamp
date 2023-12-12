@@ -52,14 +52,6 @@ userSchema.methods.correctPassword = async function (
 ) {
   return await bcrypt.compare(plainPassword, hashPassword);
 };
-//
-// userSchema.meth
-// userSchema.methods(
-//   'correctPassword',
-//   async function (plainPassword, hashPassword) {
-//     return await bcrypt.compare(plainPassword, hashPassword);
-//   },
-// );
 
 const User = mongoose.model('User', userSchema);
 

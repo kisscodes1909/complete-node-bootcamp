@@ -52,3 +52,32 @@ exports.login = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+exports.protectRoute = catchAsync(async (req, res, next) => {
+  //1. Get Token
+  // console.log(req.headers);
+
+  const token =
+    req.headers.hasOwnProperty('authorization') &&
+    req.headers.authorization.startsWith('Bear')
+      ? req.headers.authorization.split(' ')[1]
+      : null;
+
+  if (!token) {
+    next(new AppError('Please logged in!', 401));
+  }
+
+  //2. Verify Token
+  const tokenDecoded = jwt.verify(token, process.env.JWT_SECRET);
+
+  //3. Check user still exist
+  const user = await User.findById(tokenDecoded.id);
+
+  if (!user) {
+    next(new AppError('User is not exist', 401));
+  }
+
+  //4. Check user change password after issue token
+
+  next();
+});
