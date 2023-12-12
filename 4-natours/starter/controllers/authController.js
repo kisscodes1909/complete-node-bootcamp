@@ -78,6 +78,16 @@ exports.protectRoute = catchAsync(async (req, res, next) => {
   }
 
   //4. Check user change password after issue token
+  // The logic is compare token iat(Issue Token at) vs Password change at.
+
+  //4.1 Need a Update Password Timestamp in user model
+  //4.2 When user update password and update password timestamp
+  //4.3 When user request then check
+  const passwordChanged = user.changePasswordAfter(tokenDecoded.iat);
+
+  if (passwordChanged) {
+    next(new AppError('The password is changed, please try login again!', 401));
+  }
 
   next();
 });
