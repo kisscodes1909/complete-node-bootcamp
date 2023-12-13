@@ -93,3 +93,13 @@ exports.protectRoute = catchAsync(async (req, res, next) => {
 
   next();
 });
+
+exports.restrictTo = (roles) => (req, res, next) => {
+  const { role: userRole } = req.user;
+
+  if (roles.includes(userRole)) {
+    next(new AppError('Sorry, You dont have permission for this action', 403));
+  }
+
+  next();
+};
