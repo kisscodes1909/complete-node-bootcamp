@@ -89,5 +89,7 @@ exports.protectRoute = catchAsync(async (req, res, next) => {
     next(new AppError('The password is changed, please try login again!', 401));
   }
 
+  req.user = user;
+
   next();
 });
